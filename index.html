@@ -1611,6 +1611,15 @@
       color: var(--muted)
     }
 
+    .pkg .t .gift-line {
+      display: block;
+      margin-top: 4px;
+      font-style: normal;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--green)
+    }
+
     .pkg .p {
       font-weight: 700;
       color: var(--red);
@@ -1703,6 +1712,12 @@
       display: flex;
       justify-content: space-between;
       padding: 3px 0
+    }
+
+    .summary .sum-gift span:last-child {
+      color: var(--green);
+      font-weight: 600;
+      text-align: right
     }
 
     .summary .total {
@@ -2040,7 +2055,7 @@
       <div class="inside-grid">
         <article class="book-card reveal">
           <!-- PHOTO-SLOT: thay bằng <img src="trang-luyen-viet.jpg" alt="Trang bên trong sách luyện viết"> -->
-          <div class="photo-slot">Ảnh thật: trang bên trong sách luyện viết<br>(thay bằng ảnh chụp sản phẩm)</div>
+          <div class="photo-slot">Ảnh thật: trang bên trong sách luyện viết<br><img src="./img/5.webp" alt="Trang bên trong sách luyện viết"></div>
           <div class="body">
             <h3>Sách luyện viết 2500 chữ Hán</h3>
             <p>Bảng chữ in màu, mỗi ô một chữ kèm pinyin. Dùng để tô theo mẫu và nhận diện mặt chữ, sắp từ chữ đơn giản
@@ -2071,7 +2086,7 @@
         </article>
         <article class="book-card reveal">
           <!-- PHOTO-SLOT: thay bằng <img src="trang-giai-nghia.jpg" alt="Trang bên trong sách giải nghĩa"> -->
-          <div class="photo-slot">Ảnh thật: trang bên trong sách giải nghĩa<br>(thay bằng ảnh chụp sản phẩm)</div>
+          <div class="photo-slot">Ảnh thật: trang bên trong sách giải nghĩa<br><img src="./img/giải nghĩa.jpg" alt="Trang bên trong sách giải nghĩa"></div>
           <div class="body">
             <h3>Sách giải nghĩa 5000 từ vựng</h3>
             <p>Giải thích 214 bộ thủ và 5000 từ vựng thông dụng bằng tiếng Việt, trình bày theo mục để tra cứu nhanh khi
@@ -2370,13 +2385,13 @@
           <label>
             <input type="radio" name="package" value="1">
             <span class="t"><b>Combo 1 bộ (2 cuốn)</b><small>+ <span data-price="ship1">30.000đ</span>
-                ship</small></span>
+                ship</small><em class="gift-line hidden"></em></span>
             <span class="p" data-price="p1">259.000đ</span>
           </label>
           <label>
             <input type="radio" name="package" value="2" checked>
             <span class="t"><b>Combo 2 bộ (4 cuốn) · Freeship</b><small>~<span data-price="per2">194.500đ</span>/bộ,
-                tiết kiệm <span data-price="save2">189.000đ</span></small></span>
+                tiết kiệm <span data-price="save2">189.000đ</span></small><em class="gift-line hidden"></em></span>
             <span class="p" data-price="p2">389.000đ</span>
           </label>
         </div>
@@ -2431,6 +2446,7 @@
         <div class="summary">
           <div><span id="sumName">Combo 2 bộ</span><span id="sumPrice">389.000đ</span></div>
           <div><span>Phí vận chuyển</span><span id="sumShip">Miễn phí</span></div>
+          <div class="sum-gift hidden"><span>Quà tặng kèm</span><span id="sumGift"></span></div>
           <div class="total"><span>Tổng thanh toán khi nhận</span><span id="sumTotal">389.000đ</span></div>
         </div>
         <button class="btn" type="submit" id="submitBtn">Đặt hàng ngay – trả tiền khi nhận</button>
@@ -2470,8 +2486,7 @@
           </ul>
         </div>
       </div>
-      <div class="copy">© <span id="year"></span> <span data-cfg="brandName">Hán Tự Mỗi Ngày</span>. Hình ảnh và thông
-        số sản phẩm đúng như mô tả.</div>
+      <div class="copy">© <span id="year"></span> <span data-cfg="brandName">Hán Tự Mỗi Ngày</div>
     </div>
   </footer>
 
@@ -2498,11 +2513,11 @@
        ============================================================ */
     const CONFIG = {
       brandName: "Hán Tự Mỗi Ngày",
-      companyName: "[Tên hộ kinh doanh / công ty]",
-      taxCode: "[Mã số thuế]",
-      address: "[Địa chỉ kinh doanh]",
-      hotline: "0900 000 000",
-      email: "[email]",
+      companyName: "HỘ KINH DOANH TRẦN THỊ HỒNG NGA 1972",
+      taxCode: "001172003364",
+      address: "114 Nguyễn Văn Trỗi - Tổ dân phố 5 Mộ Lao, Phường Hà Đông, Thành phố Hà Nội, Việt Nam",
+      hotline: "083846868",
+      email: "datvu06803@gmail.com",
       hoursWeekday: "Thứ 2 – Thứ 6: 8:00 – 17:30",
       hoursSat: "Thứ 7: 8:00 – 12:00",
       deliveryDays: "2–4 ngày",          // dùng thống nhất ở mọi nơi trên trang
@@ -2522,26 +2537,28 @@
       // Giá gạch: chỉ điền nếu đây là giá bán THẬT trước đây. Để 0 thì ẩn.
       compareAtPrice: 500000,
       // Số đã bán: chỉ điền số THẬT (lấy từ hệ thống đơn hàng). Để 0 thì ẩn.
-      soldCount: 1440,
+      soldCount: 9440,
       autoplayMs: 4000,                  // 0 = tắt tự chạy slider
 
       price1: 259000, ship1: 30000,       // Combo 1 bộ
       price2: 389000, ship2: 0,           // Combo 2 bộ
 
       // Quà tặng kèm: để "" nếu không tặng. VD: "Tặng 1 bút bay màu + 10 ruột"
-      gift: "",
+      gift: "Tặng 1 bút bay màu + 10 ruột",
 
       // Hạn ưu đãi THẬT (ISO, giờ VN). Để "" để ẩn đồng hồ. Đồng hồ không tự reset.
       promoEnd: "",                       // VD: "2026-10-31T23:59:00+07:00"
       promoLabel: "Ưu đãi miễn ship Combo 2 kết thúc sau",
 
-      // Nơi nhận đơn: URL webhook / Google Apps Script (POST JSON). Để "" để chạy thử.
-      submitUrl: "",
+      // Nơi nhận đơn: URL Web App của Google Apps Script (xem file google-apps-script.gs).
+      // Đơn sẽ ghi vào Google Sheet + gửi email thông báo. Để "" để chạy thử.
+      submitUrl: "https://script.google.com/macros/s/AKfycbw9kwifHqDyBvjjMjYlPqDoZHYIIc6T3LIpabLXMQ2XshFDlwHyVG65hbME1J99Vhxh-A/exec",
 
       // Chỉ thêm đánh giá THẬT của khách (có thể kèm ảnh khách gửi).
       // VD: { name:"Chị Lan", place:"Hà Nội", stars:5, text:"...", img:"review1.jpg" }
       reviews: [
         { name:"Chị Lan", place:"Hà Nội", stars:5, text:"Sách hỗ trợ tốt cho quá trình học tiếng Trung của tôi", img:"./img/5.webp" },
+        { name:"Chị Hoa", place:"Hồ Chí Minh", stars:5, text:"Sách giải nghĩa rất chi tiết và dễ hiểu", img:"./img/fb gn.jpg" },
       ]
     };
 
@@ -2574,6 +2591,8 @@
     // Gift
     if (CONFIG.gift) {
       $$(".gift-line").forEach(li => { li.textContent = "🎁 " + CONFIG.gift; li.classList.remove("hidden"); });
+      $("#sumGift").textContent = "🎁 " + CONFIG.gift;
+      $(".sum-gift").classList.remove("hidden");
       $("#faqPen").textContent += " Hiện shop đang tặng kèm: " + CONFIG.gift + ".";
     }
 
@@ -2675,6 +2694,8 @@
       const data = {
         code,
         package: pkg === "2" ? "Combo 2 bộ" : "Combo 1 bộ",
+        price: pkg === "2" ? CONFIG.price2 : CONFIG.price1,
+        ship: pkg === "2" ? CONFIG.ship2 : CONFIG.ship1,
         total: pkg === "2" ? total2 : total1,
         name: form.elements.name.value.trim(),
         phone: form.elements.phone.value.replace(/[\s.-]/g, ""),
@@ -2685,7 +2706,7 @@
         note: form.elements.note.value.trim(),
         gift: CONFIG.gift || "",
         page: location.href,
-        time: new Date().toISOString()
+        time: new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
       };
 
       try {
