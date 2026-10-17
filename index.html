@@ -27,6 +27,25 @@
   ============================================================
 -->
   <!-- PIXEL: dán mã Facebook Pixel ở đây -->
+  <!-- Meta Pixel Code -->
+  <script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1105618635557255');
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=1105618635557255&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code -->
 
   <style>
     :root {
@@ -2055,7 +2074,8 @@
       <div class="inside-grid">
         <article class="book-card reveal">
           <!-- PHOTO-SLOT: thay bằng <img src="trang-luyen-viet.jpg" alt="Trang bên trong sách luyện viết"> -->
-          <div class="photo-slot">Ảnh thật: trang bên trong sách luyện viết<br><img src="./img/5.webp" alt="Trang bên trong sách luyện viết"></div>
+          <div class="photo-slot">Ảnh thật: trang bên trong sách luyện viết<br><img src="./img/5.webp"
+              alt="Trang bên trong sách luyện viết"></div>
           <div class="body">
             <h3>Sách luyện viết 2500 chữ Hán</h3>
             <p>Bảng chữ in màu, mỗi ô một chữ kèm pinyin. Dùng để tô theo mẫu và nhận diện mặt chữ, sắp từ chữ đơn giản
@@ -2086,7 +2106,8 @@
         </article>
         <article class="book-card reveal">
           <!-- PHOTO-SLOT: thay bằng <img src="trang-giai-nghia.jpg" alt="Trang bên trong sách giải nghĩa"> -->
-          <div class="photo-slot">Ảnh thật: trang bên trong sách giải nghĩa<br><img src="./img/giải nghĩa.jpg" alt="Trang bên trong sách giải nghĩa"></div>
+          <div class="photo-slot">Ảnh thật: trang bên trong sách giải nghĩa<br><img src="./img/giải nghĩa.jpg"
+              alt="Trang bên trong sách giải nghĩa"></div>
           <div class="body">
             <h3>Sách giải nghĩa 5000 từ vựng</h3>
             <p>Giải thích 214 bộ thủ và 5000 từ vựng thông dụng bằng tiếng Việt, trình bày theo mục để tra cứu nhanh khi
@@ -2356,7 +2377,8 @@
         <details class="reveal">
           <summary>Bao lâu nhận được hàng? Phí ship bao nhiêu?</summary>
           <div class="ans">Thường mất <span data-cfg="deliveryDays">2–4 ngày</span> tuỳ khu vực. Combo 1 bộ phí ship
-            <span data-price="ship1">30.000đ</span>, Combo 2 bộ miễn phí ship.</div>
+            <span data-price="ship1">30.000đ</span>, Combo 2 bộ miễn phí ship.
+          </div>
         </details>
         <details class="reveal">
           <summary>Sách bị lỗi thì đổi trả thế nào?</summary>
@@ -2557,8 +2579,8 @@
       // Chỉ thêm đánh giá THẬT của khách (có thể kèm ảnh khách gửi).
       // VD: { name:"Chị Lan", place:"Hà Nội", stars:5, text:"...", img:"review1.jpg" }
       reviews: [
-        { name:"Chị Lan", place:"Hà Nội", stars:5, text:"Sách hỗ trợ tốt cho quá trình học tiếng Trung của tôi", img:"./img/5.webp" },
-        { name:"Chị Hoa", place:"Hồ Chí Minh", stars:5, text:"Sách giải nghĩa rất chi tiết và dễ hiểu", img:"./img/fb gn.jpg" },
+        { name: "Chị Lan", place: "Hà Nội", stars: 5, text: "Sách hỗ trợ tốt cho quá trình học tiếng Trung của tôi", img: "./img/5.webp" },
+        { name: "Chị Hoa", place: "Hồ Chí Minh", stars: 5, text: "Sách giải nghĩa rất chi tiết và dễ hiểu", img: "./img/fb gn.jpg" },
       ]
     };
 
