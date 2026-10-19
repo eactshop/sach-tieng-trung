@@ -1645,6 +1645,35 @@
       white-space: nowrap
     }
 
+    .pkg-img {
+      position: relative;
+      margin: -6px 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff
+    }
+
+    .pkg-img img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      object-fit: contain
+    }
+
+    .pkg-img .qty {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 999px
+    }
+
     .field {
       margin-bottom: 14px
     }
@@ -2417,6 +2446,10 @@
             <span class="p" data-price="p2">389.000đ</span>
           </label>
         </div>
+        <div class="pkg-img">
+          <img id="pkgImg" src="./img/1.webp" alt="Ảnh combo đã chọn" loading="lazy">
+          <span class="qty hidden" id="pkgQty">x2 bộ</span>
+        </div>
 
         <div class="row2">
           <div class="field" data-f="name">
@@ -2557,18 +2590,26 @@
       ],
 
       // Giá gạch: chỉ điền nếu đây là giá bán THẬT trước đây. Để 0 thì ẩn.
-      compareAtPrice: 500000,
+      compareAtPrice: 400000,
       // Số đã bán: chỉ điền số THẬT (lấy từ hệ thống đơn hàng). Để 0 thì ẩn.
       soldCount: 9440,
       autoplayMs: 4000,                  // 0 = tắt tự chạy slider
 
-      price1: 259000, ship1: 30000,       // Combo 1 bộ
-      price2: 389000, ship2: 0,           // Combo 2 bộ
+      price1: 199000, ship1: 30000,       // Combo 1 bộ
+      price2: 349000, ship2: 0,           // Combo 2 bộ
+
+      // Ảnh hiện dưới phần chọn gói ở form đặt hàng.
+      // combo2Img để "" (hoặc file chưa có) thì dùng ảnh combo 1 + nhãn "x2 bộ".
+      combo1Img: "./img/1.webp",
+      combo2Img: "",                      // VD: "./img/combo-2.webp"
 
       // Quà tặng kèm: để "" nếu không tặng. VD: "Tặng 1 bút bay màu + 10 ruột"
       gift: "Tặng 1 bút bay màu + 10 ruột",
 
-      // Hạn ưu đãi THẬT (ISO, giờ VN). Để "" để ẩn đồng hồ. Đồng hồ không tự reset.
+      // Đồng hồ ưu đãi: mỗi khách vào trang sẽ thấy đếm ngược promoMinutes phút
+      // (F5 không reset; hết giờ thì tự quay lại từ đầu). Đặt 0 để dùng hạn cố định promoEnd.
+      promoMinutes: 15,
+      // Hạn cố định (ISO, giờ VN) – chỉ dùng khi promoMinutes = 0. Để "" để ẩn đồng hồ.
       promoEnd: "",                       // VD: "2026-10-31T23:59:00+07:00"
       promoLabel: "Ưu đãi miễn ship Combo 2 kết thúc sau",
 
@@ -2634,16 +2675,26 @@
       $("#danh-gia").classList.remove("hidden");
     }
 
-    // Countdown – real deadline only
+    // Countdown – per-visitor N minutes, or fixed deadline
     (function () {
-      if (!CONFIG.promoEnd) return;
-      const end = new Date(CONFIG.promoEnd).getTime();
-      if (isNaN(end) || end <= Date.now()) return;
+      const KEY = "promoEndAt";
+      const dur = (CONFIG.promoMinutes || 0) * 60000;
+      const newEnd = () => { const e = Date.now() + dur; try { localStorage.setItem(KEY, e); } catch (_) {} return e; };
+      let end;
+      if (dur > 0) {
+        try { end = +localStorage.getItem(KEY); } catch (_) {}
+        if (!end || end <= Date.now() || end - Date.now() > dur) end = newEnd();
+      } else {
+        if (!CONFIG.promoEnd) return;
+        end = new Date(CONFIG.promoEnd).getTime();
+        if (isNaN(end) || end <= Date.now()) return;
+      }
       $("#cdLabel").textContent = CONFIG.promoLabel;
       $("#countdown").classList.remove("hidden");
       const pad = n => String(n).padStart(2, "0");
       const tick = () => {
         let s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+        if (s === 0 && dur > 0) { end = newEnd(); s = Math.floor(dur / 1000); }
         if (s === 0) { $("#countdown").classList.add("hidden"); $("#heroCd").classList.add("hidden"); clearInterval(t); return; }
         $("#cdD").textContent = pad(Math.floor(s / 86400)); s %= 86400;
         $("#cdH").textContent = pad(Math.floor(s / 3600)); s %= 3600;
@@ -2669,6 +2720,13 @@
       const ship = two ? CONFIG.ship2 : CONFIG.ship1;
       $("#sumShip").textContent = ship ? fmt(ship) : "Miễn phí";
       $("#sumTotal").textContent = fmt(two ? total2 : total1);
+      // Combo image
+      const img = $("#pkgImg"), src = two ? CONFIG.combo2Img : CONFIG.combo1Img;
+      img.onerror = two ? () => { img.onerror = null; img.src = CONFIG.combo1Img; $("#pkgQty").classList.remove("hidden"); } : null;
+      $("#pkgQty").classList.toggle("hidden", !two || !!CONFIG.combo2Img);
+      if (!src) img.onerror && img.onerror();
+      else img.src = src;
+      img.alt = two ? "Combo 2 bộ (4 cuốn)" : "Combo 1 bộ (2 cuốn)";
     }
     $$('input[name="package"]').forEach(r => r.addEventListener("change", updateSummary));
     $$("[data-pick]").forEach(b => b.addEventListener("click", () => {
