@@ -1886,6 +1886,69 @@
       }
     }
 
+    /* Promo toast */
+    .promo-toast {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      z-index: 60;
+      max-width: min(340px, calc(100vw - 32px));
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--red);
+      border-radius: 12px;
+      padding: 10px 34px 10px 12px;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .3);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      transition: opacity .3s, transform .3s
+    }
+
+    .promo-toast.show {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto
+    }
+
+    .promo-toast .ic {
+      font-size: 24px;
+      flex: 0 0 auto
+    }
+
+    .promo-toast .tx {
+      font-size: 14px;
+      line-height: 1.35
+    }
+
+    .promo-toast .tx b {
+      display: block;
+      color: var(--red)
+    }
+
+    .promo-toast .x {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      border: 0;
+      background: none;
+      font-size: 18px;
+      line-height: 1;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 4px
+    }
+
+    @media(max-width:760px) {
+      .promo-toast {
+        bottom: 84px
+      }
+    }
+
     /* Modal */
     .modal {
       position: fixed;
@@ -2550,6 +2613,12 @@
     <a href="#dat-hang" class="btn">Đặt hàng</a>
   </div>
 
+  <div class="promo-toast" id="promoToast" role="status" aria-live="polite">
+    <span class="ic" id="ptIcon">🎁</span>
+    <div class="tx" id="ptText"></div>
+    <button type="button" class="x" id="ptClose" aria-label="Đóng">×</button>
+  </div>
+
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="modal-card">
       <div class="ok">✓</div>
@@ -2580,7 +2649,7 @@
 
       // Ảnh slider đầu trang (ảnh chụp sản phẩm THẬT). Để [] thì hiện ảnh minh hoạ.
       // VD: { src:"anh-1.jpg", alt:"Combo 2 cuốn", thumb:"anh-1-nho.jpg" }
-      images: [{ src: "./img/1.webp", alt: "Combo 2 cuốn", thumb: "./img/1.webp" },
+      images: [{ src: "./img/combo.jpg", alt: "Combo 2 cuốn", thumb: "./img/combo.jpg" },
       { src: "./img/2.webp", alt: "Combo 2 cuốn", thumb: "./img/2.webp" },
       { src: "./img/3.webp", alt: "Combo 2 cuốn", thumb: "./img/3.webp" },
       { src: "./img/4.webp", alt: "Combo 2 cuốn", thumb: "./img/4.webp" },
@@ -2600,8 +2669,17 @@
 
       // Ảnh hiện dưới phần chọn gói ở form đặt hàng.
       // combo2Img để "" (hoặc file chưa có) thì dùng ảnh combo 1 + nhãn "x2 bộ".
-      combo1Img: "./img/1.webp",
+      combo1Img: "./img/combo.jpg",                      // VD: "./img/combo-1.webp"
       combo2Img: "",                      // VD: "./img/combo-2.webp"
+
+      // Popup ưu đãi góc màn hình. Để [] để tắt. {timer} = thời gian còn lại của đồng hồ ưu đãi.
+      promoToastMs: 15000,                // mỗi 15s hiện 1 popup
+      promoToasts: [
+        { icon: "🚚", title: "Combo 2 bộ – Freeship toàn quốc", text: "Chỉ {per2}/bộ, tiết kiệm {save2}" },
+        { icon: "🎁", title: "Quà tặng kèm mỗi đơn", text: "{gift}" },
+        { icon: "⏰", title: "Ưu đãi sắp kết thúc", text: "Còn {timer} để giữ giá ưu đãi" },
+        { icon: "✅", title: "Nhận hàng mới trả tiền", text: "Được kiểm tra sách trước khi thanh toán" },
+      ],
 
       // Quà tặng kèm: để "" nếu không tặng. VD: "Tặng 1 bút bay màu + 10 ruột"
       gift: "Tặng 1 bút bay màu + 10 ruột",
@@ -2704,6 +2782,46 @@
         hc.textContent = "Còn " + ($("#cdD").textContent !== "00" ? +$("#cdD").textContent + " ngày " : "") + $("#cdH").textContent + ":" + $("#cdM").textContent + ":" + $("#cdS").textContent;
       };
       tick(); const t = setInterval(tick, 1000);
+    })();
+
+    // Promo toast – rotating real offer reminders
+    (function () {
+      const pad = n => String(n).padStart(2, "0");
+      const timer = () => {
+        let end = 0;
+        try { end = +localStorage.getItem("promoEndAt"); } catch (_) {}
+        if (!(CONFIG.promoMinutes > 0)) end = new Date(CONFIG.promoEnd).getTime();
+        const s = Math.floor((end - Date.now()) / 1000);
+        return s > 0 ? pad(Math.floor(s / 60)) + ":" + pad(s % 60) : "";
+      };
+      const vars = { per2: priceMap.per2, save2: priceMap.save2, gift: CONFIG.gift };
+      const fill = (str) => {
+        let ok = true;
+        const out = str.replace(/\{(\w+)\}/g, (_, k) => { const v = k === "timer" ? timer() : vars[k]; if (!v) ok = false; return v || ""; });
+        return ok ? out : null;
+      };
+      const items = CONFIG.promoToasts || [];
+      if (!items.length || !(CONFIG.promoToastMs > 0)) return;
+      const box = $("#promoToast");
+      let idx = 0, hideT, loopT, closed = false;
+      function show() {
+        if (closed || document.hidden) return;
+        for (let tries = 0; tries < items.length; tries++) {
+          const it = items[idx++ % items.length];
+          const title = fill(it.title), text = fill(it.text);
+          if (title === null || text === null) continue;
+          $("#ptIcon").textContent = it.icon || "🎁";
+          $("#ptText").innerHTML = "";
+          const b = document.createElement("b"); b.textContent = title;
+          $("#ptText").append(b, text);
+          box.classList.add("show");
+          clearTimeout(hideT); hideT = setTimeout(() => box.classList.remove("show"), 6000);
+          return;
+        }
+      }
+      box.addEventListener("click", () => { box.classList.remove("show"); document.querySelector("#dat-hang").scrollIntoView({ behavior: "smooth" }); });
+      $("#ptClose").addEventListener("click", e => { e.stopPropagation(); closed = true; box.classList.remove("show"); clearInterval(loopT); });
+      setTimeout(() => { show(); loopT = setInterval(show, CONFIG.promoToastMs); }, 8000);
     })();
 
     // Provinces (old 63 units)
